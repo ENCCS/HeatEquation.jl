@@ -10,7 +10,7 @@ function evolve!(curr, prev, a, dt)
 end
 
 
-function run!(ncols, nrows, nsteps, image_interval)
+function run!(ncols, nrows, nsteps, image_interval = 0)
 
     current, previous = initialize(ncols, nrows)
 
@@ -28,9 +28,11 @@ function run!(ncols, nrows, nsteps, image_interval)
 
     for i = 1:nsteps
         evolve!(current, previous, a, dt)
-        if i % image_interval == 0
-            write_field(current, "heat_$i.png")
-        end
+        if image_interval > 0 
+            if i % image_interval == 0
+                write_field(current, "heat_$i.png")
+            end
+        end 
 
         # swap current and previous fields
         tmp = current.data
