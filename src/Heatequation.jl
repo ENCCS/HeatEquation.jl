@@ -1,6 +1,5 @@
 module Heatequation
 
-using Plots; gr()
 using ProgressMeter
 
 #include("config.jl")

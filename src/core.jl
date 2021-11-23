@@ -26,12 +26,11 @@ function run!(ncols, nrows, nsteps, image_interval)
 
     p = Progress(nsteps)
 
-    # TODO: move plotting out of this loop: instead save T-fields in memory 
-    anim = @animate for i = 1:nsteps
+    for i = 1:nsteps
         evolve!(current, previous, a, dt)
-        #if i % image_interval == 0
-            write_field(current, i)
-        #end
+        if i % image_interval == 0
+            write_field(current, "heat_$i.png")
+        end
 
         # swap current and previous fields
         tmp = current.data
@@ -39,10 +38,7 @@ function run!(ncols, nrows, nsteps, image_interval)
         previous.data = tmp
 
         next!(p)
-    end every image_interval
-    gif(anim, "anim_fps15.gif", fps = 15)
-
-
+    end 
 
     # print final average temperature
     average = sum(current.data[2:current.nx+1, 2:current.ny+1])
