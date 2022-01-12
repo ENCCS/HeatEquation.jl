@@ -14,36 +14,36 @@ mutable struct Field #{T<:AbstractFloat}
 end
 
 # outer constructor with default cell sizes
-#Field(nx, ny) = Field(nx, ny, 0.01, 0.01, zeros(Float64, nx+2, ny+2))
 Field(nx, ny) = Field(nx, ny, 0.01, 0.01, zeros(nx+2, ny+2))
 
 # extend deepcopy to new type
 Base.deepcopy(f::Field) = Field(f.nx, f.ny, f.dx, f.dy, deepcopy(f.data))
 
+"""
+    initialize(rows::Int, cols::Int)
 
-function initialize(rows = 2000, cols = 2000)
+Initialize two temperature field with (nrows, ncols) number of 
+rows and columns.
+"""
+function initialize(nrows = 1000, ncols = 1000)
 
-    using_input_file = false
+    previous = Field(nrows, ncols)
 
-    previous = Field(rows, cols)
-
-    # TODO: enable reading from input file and reading nrows, ncols etc
-    # from command line or from script
-
-    #set_field_dimensions(previous, rows, cols)
-    #set_field_dimensions(current, rows, cols)
+    # generate a specific field with boundary conditions
     generate_field!(previous)
     current = Base.deepcopy(previous)
 
     return previous, current
 end
 
-# Generate initial the temperature field.  Pattern is disc with a radius
-# of nx / 6 in the center of the grid.
-# Boundary conditions are (different) constant temperatures outside the grid
+"""
+    generate_field!(field0::Field)
 
-function generate_field!(field0)
-
+Generate a temperature field.  Pattern is disc with a radius
+of nx / 6 in the center of the grid. Boundary conditions are 
+(different) constant temperatures outside the grid.
+"""
+function generate_field!(field0::Field)
     # Square of the disk radius
     radius2 = (field0.nx / 6.0)^2
 
