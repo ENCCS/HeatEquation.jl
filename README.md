@@ -1,9 +1,10 @@
 # HeatEquation.jl
 
-This is a Julia version of [this educational heat-equation
-implementation in C/C++/Fortran demostrating various parallel
-programming approaches](https://github.com/cschpc/heat-equation) from
-[CSC – IT Center for Science](https://www.csc.fi/en/home).  
+This is a Julia version of [an educational heat-equation
+implementation in
+C/C++/Fortran](https://github.com/cschpc/heat-equation) demostrating
+various parallel programming approaches from [CSC – IT Center for
+Science](https://www.csc.fi/en/home).
 
 ## The two dimensional heat equation
 
