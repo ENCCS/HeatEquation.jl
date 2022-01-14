@@ -1,14 +1,20 @@
 """
-    write_field(curr, filename=:none)
+    visualize(curr::Field, filename=:none)
 
-Write a png file with a visualization of temperature field curr.    
-"""
-function write_field(curr, filename=:none)
-    # call external pngwriter library 
-    ccall((:save_png, "$(@__DIR__)/pngwriter/libpngwriter.so"), 
-        Int64, 
-        (Ptr{Cdouble}, Cint, Cint, Cstring, Cchar), 
-        curr.data[2:curr.nx+1, 2:curr.ny+1], curr.nx, curr.ny, filename, 'F')
+Create a heatmap of a temperature field. Optionally write png file. 
+"""    
+function visualize(curr::Field, filename=:none)
+    background_color = :white
+
+    plot = heatmap(
+        curr.data,
+        colorbar_title = "Temperature (C)",
+        background_color = background_color
+    )
+
+    if filename != :none
+        savefig(filename)
+    else
+        display(plot)
+    end
 end
-
-

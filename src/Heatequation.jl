@@ -1,11 +1,12 @@
-module Heatequation
+module HeatEquation
 
 using ProgressMeter
+using Plots
 
-include("io.jl")
 include("setup.jl")
+include("io.jl")
 include("core.jl")
 
-export Field, simulate
+export Field, simulate!, initialize, visualize
 
 end # module
