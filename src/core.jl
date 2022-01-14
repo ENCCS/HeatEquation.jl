@@ -1,4 +1,3 @@
-
 """
     evolve!(curr::Field, prev::Field, a, dt)
 
@@ -16,49 +15,43 @@ function evolve!(curr::Field, prev::Field, a, dt)
     end
 end
 
-"""
-    simulate(ncols, nrows, nsteps, image_interval = 0)
+""" 
+    average_temperature(f::Field)
 
-    
+Calculate average temperature of a temperature field.        
 """
-function simulate(ncols, nrows, nsteps, image_interval = 0)
-    # initialize current and previous states to the same state
-    current, previous = initialize(ncols, nrows)
+average_temperature(f::Field) = sum(f.data[2:f.nx+1, 2:f.ny+1]) / (f.nx * f.ny)
 
-    # print initial average temperature
-    average = sum(current.data[2:current.nx+1, 2:current.ny+1])
-    average = average / (current.nx * current.ny)
-    println("Average temperature at start: $average")
+"""
+    simulate!(current, previous, nsteps)
+
+Run the heat equation solver on fields curr and prev for nsteps.
+"""
+function simulate!(curr::Field, prev::Field, nsteps)
+
+    println("Initial average temperature: $(average_temperature(curr))")
 
     # Diffusion constant
     a = 0.5
     # Largest stable time step
-    dt = current.dx^2 * current.dy^2 / (2.0 * a * (current.dx^2 + current.dy^2))
+    dt = curr.dx^2 * curr.dy^2 / (2.0 * a * (curr.dx^2 + curr.dy^2))
 
     # display a nice progress bar
     p = Progress(nsteps)
 
     for i = 1:nsteps
         # calculate new state based on previous state
-        evolve!(current, previous, a, dt)
-        if image_interval > 0 
-            if i % image_interval == 0
-                write_field(current, "heat_$i.png")
-            end
-        end 
+        evolve!(curr, prev, a, dt)
 
         # swap current and previous fields
-        tmp = current.data
-        current.data = previous.data
-        previous.data = tmp
+        tmp = curr.data
+        curr.data = prev.data
+        prev.data = tmp
 
         # increment the progress bar
         next!(p)
     end 
 
     # print final average temperature
-    average = sum(current.data[2:current.nx+1, 2:current.ny+1])
-    average = average / (current.nx * current.ny)
-    println("Average temperature at end: $average")
+    println("Final average temperature: $(average_temperature(curr))")
 end
-
