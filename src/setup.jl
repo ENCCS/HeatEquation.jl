@@ -2,11 +2,11 @@
 """
     Field(nx::Int64, ny::Int64, dx::Float64, dy::Float64, data::Matrix{Float64})
 
-Temperature field type.
+Temperature field type. nx and ny are the dimensions of the field. 
+The array data contains also ghost layers, so it will have dimensions 
+[nx+2, ny+2]
 """
 mutable struct Field
-    # nx and ny are the dimensions of the field. The array data
-    # contains also ghost layers, so it will have dimensions nx+2 x ny+2
     nx::Int64
     ny::Int64
     # Size of the grid cells
@@ -17,7 +17,7 @@ mutable struct Field
 end
 
 # outer constructor with default cell sizes and initialized data
-Field(nx, ny) = Field(nx, ny, 0.01, 0.01, zeros(nx+2, ny+2))
+Field(nx::Int64, ny::Int64) = Field(nx, ny, 0.01, 0.01, zeros(nx+2, ny+2))
 
 # extend deepcopy to new type
 Base.deepcopy(f::Field) = Field(f.nx, f.ny, f.dx, f.dy, deepcopy(f.data))
