@@ -2,6 +2,8 @@ module HeatEquation
 
 using ProgressMeter
 using Plots
+using SharedArrays
+using Distributed
 
 include("setup.jl")
 include("io.jl")

@@ -8,14 +8,22 @@ stable time step.
 function evolve!(curr::Field, prev::Field, a, dt)
     for j = 2:curr.ny+1
         for i = 2:curr.nx+1
-            xderiv = (prev.data[i-1, j] - 2.0 * prev.data[i, j] + prev.data[i+1, j]) / curr.dx^2
-            yderiv = (prev.data[i, j-1] - 2.0 * prev.data[i, j] + prev.data[i, j+1]) / curr.dy^2
-            curr.data[i, j] = prev.data[i, j] + a * dt * (xderiv + yderiv)
+            @inbounds xderiv = (prev.data[i-1, j] - 2.0 * prev.data[i, j] + prev.data[i+1, j]) / curr.dx^2
+            @inbounds yderiv = (prev.data[i, j-1] - 2.0 * prev.data[i, j] + prev.data[i, j+1]) / curr.dy^2
+            @inbounds curr.data[i, j] = prev.data[i, j] + a * dt * (xderiv + yderiv)
         end 
     end
 end
 
-
+function evolve_shared!(curr::Field, prev::Field, a, dt)
+    @sync @distributed for j = 2:curr.ny+1
+        for i = 2:curr.nx+1
+            @inbounds xderiv = (prev.data[i-1, j] - 2.0 * prev.data[i, j] + prev.data[i+1, j]) / curr.dx^2
+            @inbounds yderiv = (prev.data[i, j-1] - 2.0 * prev.data[i, j] + prev.data[i, j+1]) / curr.dy^2
+            @inbounds curr.data[i, j] = prev.data[i, j] + a * dt * (xderiv + yderiv)
+        end 
+    end
+end
 
 """
     swap_fields!(curr::Field, prev::Field)
@@ -53,8 +61,13 @@ function simulate!(curr::Field, prev::Field, nsteps)
     p = Progress(nsteps)
 
     for i = 1:nsteps
+            
         # calculate new state based on previous state
-        evolve!(curr, prev, a, dt)
+        if typeof(curr.data) <: SharedArray
+            evolve_shared!(curr, prev, a, dt)
+        else
+            evolve!(curr, prev, a, dt)
+        end
 
         # swap current and previous fields
         swap_fields!(curr, prev)
