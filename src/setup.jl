@@ -6,7 +6,7 @@ Temperature field type. nx and ny are the dimensions of the field.
 The array data contains also ghost layers, so it will have dimensions 
 [nx+2, ny+2]
 """
-mutable struct Field{T<:AbstractArray{Float64, 2}}
+mutable struct Field{T<:AbstractArray}
     nx::Int64
     ny::Int64
     # Size of the grid cells
