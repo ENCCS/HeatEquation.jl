@@ -17,8 +17,8 @@ end
 
 function evolve_gpu!(currdata, prevdata, dx2, dy2, a, dt)
     nx, ny = size(currdata)    
-    j = blockIdx.x * blockDim.x + threadIdx.x
-    i = blockIdx.y * blockDim.y + threadIdx.y
+    j = (blockIdx.x - 1) * blockDim.x + threadIdx.x
+    i = (blockIdx.y - 1) * blockDim.y + threadIdx.y
 
     if i > 1 && j > 1 && i < nx+2 && j < ny+2
         xderiv = (prevdata[i-1, j] - 2.0 * prevdata[i, j] + prevdata[i+1, j]) / dx2
