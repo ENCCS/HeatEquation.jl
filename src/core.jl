@@ -16,15 +16,15 @@ function evolve!(curr::Field, prev::Field, a, dt)
 end
 
 function evolve_gpu!(currdata, prevdata, dx2, dy2, a, dt)
-    nx, ny = size(currdata)    
-    j = (blockIdx.x - 1) * blockDim.x + threadIdx.x
-    i = (blockIdx.y - 1) * blockDim.y + threadIdx.y
-
+    nx, ny = size(currdata) .- 2   
+    i = (blockIdx().x - 1) * blockDim().x + threadIdx().x
+    j = (blockIdx().y - 1) * blockDim().y + threadIdx().y
     if i > 1 && j > 1 && i < nx+2 && j < ny+2
         xderiv = (prevdata[i-1, j] - 2.0 * prevdata[i, j] + prevdata[i+1, j]) / dx2
         yderiv = (prevdata[i, j-1] - 2.0 * prevdata[i, j] + prevdata[i, j+1]) / dy2
         currdata[i, j] = prevdata[i, j] + a * dt * (xderiv + yderiv)
     end
+    return nothing
 end
 
 """
@@ -65,7 +65,9 @@ function simulate!(curr::Field, prev::Field, nsteps)
     for i = 1:nsteps
         # calculate new state based on previous state
         if typeof(curr.data) <: CuArray
-            @cuda (curr.nx, curr.ny) evolve_gpu!(curr.data, prev.data, curr.dx^2, curr.dy^2, a, dt)
+            xthreads = ythreads = 16
+            xblocks, yblocks = cld(curr.nx, xthreads), cld(curr.ny, ythreads)
+            @cuda threads=(xthreads, ythreads) blocks = (xblocks, yblocks) evolve_gpu!(curr.data, prev.data, curr.dx^2, curr.dy^2, a, dt)
         else
             evolve!(curr, prev, a, dt)
         end
