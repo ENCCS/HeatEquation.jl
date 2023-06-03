@@ -7,10 +7,10 @@ nsteps = 500
 curr, prev = initialize(ncols, nrows)
 
 # visualize initial field
-visualize_field(curr)
+visualize(curr)
 
 # simulate temperature evolution for nsteps
 simulate!(curr, prev, nsteps)
 
 # visualize final field
-visualize_field(curr)
+visualize(curr)
